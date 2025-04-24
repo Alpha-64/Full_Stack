@@ -4,6 +4,9 @@ const userModel = require('../models/userModel');
 
 
 const signup = (request, resp) => {
+  console.log("🔥 Signup route hit!");
+  console.log("Body Received:", req.body);
+
     let   {name, email, phone, password} = request.body;
     
     bcrypt.hash(password, 10, (err, hashPassword) => {
