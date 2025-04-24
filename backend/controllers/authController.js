@@ -23,34 +23,35 @@ const signup = (request, resp) => {
 
 
 const login = (req, res) => {
-    const { emailOrPhone, password } = req.body;
+  const { emailOrPhone, password } = req.body;
+  console.log("Login attempt with:", emailOrPhone);
   
-    userModel.findByEmailOrPhone(emailOrPhone, (err, results) => {
-      if (err || results.length === 0)
-        return res.status(401).json({ error: "User not found" });
-  
-      const user = results[0];
-  
-    //   if (user.status !== "active") {
-    //     return res.status(403).json({ error: `User is ${user.status}` });
-    //   }
-  
-      bcrypt.compare(password, user.password, (err, isMatch) => {
-        if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
-  
-        const token = jwt.sign(
-          { id: user.id, role: user.role },
-          process.env.JWT_SECRET,
-          { expiresIn: "1h" }
-        );
-  
-        res.json({
-          message: "Login successful",
-          token,
-          user: { id: user.id, name: user.name, role: user.role }
-        });
+  userModel.findByEmailOrPhone(emailOrPhone, (err, results) => {
+    if (err || results.length === 0) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    const user = results[0];
+
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+      if (err || !isMatch) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      const token = jwt.sign(
+        { id: user.id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+
+      res.status(200).json({
+        message: "Login successful",
+        token,
+        user: { id: user.id, name: user.name, role: user.role },
       });
     });
-  };
+  });
+};
+
 
   module.exports = {signup, login}
