@@ -39,7 +39,7 @@ const LoginForm = () => {
 
   return (
     <>
-        <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
        <Box sx={{ mt: 4, mb: 4, p: 4 }}>
           <Typography variant="h4" gutterBottom>
             Signup
