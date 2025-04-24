@@ -9,7 +9,7 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
+app.use("/api/fullstack", authRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

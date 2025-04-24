@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Container, TextField, Button, Typography, Box } from "@mui/material";
+import {TextField, Button, Typography, Box } from "@mui/material";
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import {ToastContainer, toast} from 'react-toastify';
 
 const LoginForm = () => {
 
@@ -11,35 +11,35 @@ const LoginForm = () => {
         phone: '',
         password: ''
       });
+      const [submitData, setSubmitData] = useState([]);
 
       const handleChange = (e) => {
-        setFormData(prev => ({
-          ...prev,
-          [e.target.name]: e.target.value
-        }));
+        setFormData(prev => ({...prev, [e.target.name]: e.target.value }));
       };
     
       const handleSubmit = async (e) => {
         e.preventDefault();
-    
-        const payload = {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          password: formData.password
-        };
-    
-        try {
-          const res = await axios.post('http://localhost:5000/api/signup', payload);
-          console.log('User created:', res.data);
-        } catch (err) {
-          console.error('Signup error:', err);
+        try{
+          const Response = await axios.post('http://localhost:5000/api/fullstack/signup', formData);
+          console.log('Response data',Response.data);
+          toast.success('User registered successfully!');
+          setFormData({name: '', email: '', phone: '', password: ''});
+        }catch(err){
+          console.log('Error', err.response.data);
+          if(err.response.status === 409){
+            toast.error('User already exists!');
+          }else if(err.response.status === 500){
+            toast.error('Internal server error!');
+          }else{
+            toast.error('Something went wrong!');
+          }
         }
       };
 
 
   return (
     <>
+        <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
        <Box sx={{ mt: 4, mb: 4, p: 4 }}>
           <Typography variant="h4" gutterBottom>
             Signup

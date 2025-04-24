@@ -5,14 +5,14 @@ const userModel = require('../models/userModel');
 
 const signup = (request, resp) => {
   console.log("🔥 Signup route hit!");
-  console.log("Body Received:", req.body);
+  console.log("Body Received:", request.body);
 
     let   {name, email, phone, password} = request.body;
     
     bcrypt.hash(password, 10, (err, hashPassword) => {
         if(err) return resp.status(500).json( {error: 'password hashing failed'});
 
-        const userData = { name, email, phone, password: hashPassword }
+        const userData = { name, email, phone, password: hashPassword };
         
         userModel.createUser(userData, (err, result) => {
             if(err) return resp.status(500).json( {error: 'Database Error', details: err});
