@@ -37,7 +37,6 @@ const Header = () => {
     <AppBar position="sticky">
       <Container maxWidth="xl">
         <Toolbar>
-
           {/* Logo */}
           <Typography
             variant="h6"
@@ -87,7 +86,6 @@ const Header = () => {
               ))}
             </Menu>
           </Box>
-
         </Toolbar>
       </Container>
     </AppBar>

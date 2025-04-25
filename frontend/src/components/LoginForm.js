@@ -1,80 +1,89 @@
-import React from 'react'
+import React, { useState } from "react";
 import { TextField, Button, Typography, Box } from "@mui/material";
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import { useState } from 'react';
-import 'react-toastify/dist/ReactToastify.css';
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+
 
 const LoginForm = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      console.log("Payload:", {
+        emailOrPhone: formData.email,
+        password: formData.password,
       });
-      
-      
-      const handleChange = (e) => {
-        setFormData(prev => ({...prev, [e.target.name]: e.target.value }));
-      };
-
-      const handleLogin = async (e) => {
-        e.preventDefault();
-        try{
-            console.log("Payload:", {
-                emailOrPhone: formData.email,
-                password: formData.password
-              });
-            // Send the login request to the backend              
-            const response = await axios.post('http://localhost:5000/api/fullstack/login', {
-                emailOrPhone: formData.email,
-                password: formData.password
-            });
-            console.log('Response data', response.data);
-            toast.success('Login successful!');
-            setFormData({name: '', email: '', phone: '', password: ''});
-        }catch(err){
-            console.log('Error', err.response.data);
-            if(err.response.status === 401){
-                toast.error('Invalid credentials!');
-            }else if(err.response.status === 500){
-                toast.error('Internal server error!');
-            }else{
-                toast.error('Something went wrong!');
-            }
+      // Send the login request to the backend
+      const response = await axios.post(
+        "http://localhost:5000/api/fullstack/login",
+        {
+          emailOrPhone: formData.email,
+          password: formData.password,
         }
-
+      );
+      console.log("Response data", response.data);
+      toast.success("Login successful!");
+      setFormData({ name: "", email: "" });
+      localStorage.setItem("token", response.data.token);
+      navigate("/dashboard");
+    } catch (err) {
+      console.log("Error", err.response.data);
+      if (err.response.status === 401) {
+        toast.error("Invalid credentials!");
+      } else if (err.response.status === 500) {
+        toast.error("Internal server error!");
+      } else {
+        toast.error("Something went wrong!");
       }
+    }
+  };
   return (
     <>
       <Box sx={{ mt: 4, mb: 4, p: 4 }}>
-          <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom>
+          Login
+        </Typography>
+        <form>
+          <TextField
+            fullWidth
+            label="Email or Phone"
+            name="email"
+            variant="outlined"
+            margin="normal"
+            onChange={handleChange}
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            name="password"
+            variant="outlined"
+            margin="normal"
+            onChange={handleChange}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={handleLogin}
+          >
             Login
-          </Typography>
-          <form>
-            <TextField
-              fullWidth
-                label="Email or Phone"
-                name="email"
-              variant="outlined"
-              margin="normal"
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-                name="password"
-              variant="outlined"
-              margin="normal"
-              onChange={handleChange}
-            />
-            <Button variant="contained" color="primary" fullWidth onClick={handleLogin}> 
-              Login
-            </Button>
-          </form>
-        </Box>
+          </Button>
+        </form>
+      </Box>
     </>
-  )
-}
+  );
+};
 
-export default LoginForm
+export default LoginForm;
