@@ -1,10 +1,22 @@
 import React from "react";
-import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Typography, IconButton, Button } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const drawerWidth = 200;
 
 const DashboardHeader = ({ handleDrawerOpen, open }) => {
+  let navigate = useNavigate();
+
+  const logoutUser = () => {
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully!");
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000); // wait for 1 sec
+  };
   return (
     <AppBar
       position="fixed"
@@ -28,6 +40,7 @@ const DashboardHeader = ({ handleDrawerOpen, open }) => {
       }}
     >
       <Toolbar>
+        <ToastContainer position="top-right" autoClose={2000} />
         {!open && (
           <IconButton
             onClick={handleDrawerOpen}
@@ -41,6 +54,13 @@ const DashboardHeader = ({ handleDrawerOpen, open }) => {
         <Typography variant="h6" noWrap component="div">
           Mr Admin Dashboard
         </Typography>
+
+        <Button
+          sx={{ color: "#fff", backgroundColor: "#ccc" }}
+          onClick={logoutUser}
+        >
+          Logout
+        </Button>
       </Toolbar>
     </AppBar>
   );

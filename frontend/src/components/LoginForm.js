@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 const LoginForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "",
+    emailOrPhone: "",
     password: "",
   });
 
@@ -28,7 +28,7 @@ const LoginForm = () => {
       const response = await axios.post(
         "http://localhost:5000/api/fullstack/login",
         {
-          emailOrPhone: formData.email,
+          emailOrPhone: formData.emailOrPhone,
           password: formData.password,
         }
       );
@@ -58,7 +58,7 @@ const LoginForm = () => {
           <TextField
             fullWidth
             label="Email or Phone"
-            name="email"
+            name="emailOrPhone"
             variant="outlined"
             margin="normal"
             onChange={handleChange}
