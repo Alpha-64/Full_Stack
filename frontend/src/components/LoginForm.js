@@ -20,7 +20,7 @@ const LoginForm = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      console.log("Payload:", {
+      console.log("Payload front function:", {
         emailOrPhone: formData.email,
         password: formData.password,
       });
