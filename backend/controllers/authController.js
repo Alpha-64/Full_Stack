@@ -5,55 +5,61 @@ const { findOrCreateGoogleUser } = require('../models/userModel');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-const signup = (request, resp) => {
+const signup = async (request, resp) => {
   console.log("🔥 Signup route hit!");
   console.log("Body Received:", request.body);
 
-    let   {name, email, phone, password} = request.body;
-    
-    bcrypt.hash(password, 10, (err, hashPassword) => {
-        if(err) return resp.status(500).json( {error: 'password hashing failed'});
+  const { name, email, phone, password } = request.body;
 
-        const userData = { name, email, phone, password: hashPassword };
-        
-        userModel.createUser(userData, (err, result) => {
-            if(err) return resp.status(500).json( {error: 'Database Error', details: err});
-            resp.status(201).json({ message: 'user registered sussessfully'})
-        })
-    })
-}
+  try {
+    const hashPassword = await bcrypt.hash(password, 10);
+    const userData = { name, email, phone, password: hashPassword };
+    await userModel.createUser(userData);
+    return resp.status(201).json({ message: "User registered successfully" });
+
+  } catch (err) {
+    console.error("Signup Error:", err);
+    return resp.status(500).json({ error: "Internal server error", details: err });
+  }
+};
 
 
-const login = (req, res) => {
+// authController.js
+const login = async (req, res) => {
   const { emailOrPhone, password } = req.body;
   console.log("Login attempt with:", emailOrPhone);
-  
-  userModel.findByEmailOrPhone(emailOrPhone, (err, results) => {
-    if (err || results.length === 0) {
+
+  try {
+    const results = await userModel.findByEmailOrPhone(emailOrPhone);
+
+    if (results.length === 0) {
       return res.status(401).json({ error: "User not found" });
     }
 
     const user = results[0];
 
-    bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err || !isMatch) {
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
 
-      const token = jwt.sign(
-        { id: user.id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
-      res.status(200).json({
-        message: "Login successful",
-        token,
-        user: { id: user.id, name: user.name, role: user.role },
-      });
+    return res.status(200).json({
+      message: "Login successful",
+      token,
+      user: { id: user.id, name: user.name, role: user.role },
     });
-  });
+  } catch (err) {
+    console.error("Login Error:", err);
+    return res.status(500).json({ error: "Internal server error", details: err });
+  }
 };
+
 
 const  googleLogin = async (req, res) => {
   try {

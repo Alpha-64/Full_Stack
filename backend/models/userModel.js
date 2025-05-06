@@ -1,7 +1,7 @@
 const db = require("../config/db");
 const jwt = require("jsonwebtoken");
 
-const createUser = (userData, callback) => {
+const createUser =async (userData) => {
   const {
     name,
     email,
@@ -17,7 +17,7 @@ const createUser = (userData, callback) => {
   const sql = `INSERT INTO users (name, email, phone, password, role, created_at, updated_at, status, google_id) 
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  db.query(
+  const [results] = await db.query(
     sql,
     [
       name,
@@ -29,14 +29,14 @@ const createUser = (userData, callback) => {
       updated_at,
       status,
       google_id,
-    ],
-    callback
-  );
+    ]);
+    return results;
 };
 
-const findByEmailOrPhone = (mailOrPhone, callback) => {
+const findByEmailOrPhone = async (mailOrPhone) => {
   const sql = `SELECT * FROM users WHERE email = ? OR phone = ?`;
-  db.query(sql, [mailOrPhone, mailOrPhone], callback);
+  const [results] = await db.query(sql, [mailOrPhone, mailOrPhone]);
+  return results;
 };
 
 function generateJWT(user) {
@@ -59,7 +59,7 @@ async function findOrCreateGoogleUser(payload) {
     user = rows[0];
   } else {
     const [result] = await db.query(
-      'INSERT INTO users (name, email, google_id, login_type created_at, updated_at ) VALUES (?, ?, ?, ?, NOW(), NOW())',
+      'INSERT INTO users (name, email, google_id, login_type, created_at, updated_at ) VALUES (?, ?, ?, ?, NOW(), NOW())',
       [name, email, google_id, 'google']
     );
 
